@@ -367,7 +367,7 @@ image of type numpy.uint8.'''
             detection.corners = corners
 
             if estimate_tag_pose:
-                if camera_params==None:
+                if camera_params is None:
                     raise Exception('camera_params must be provided to detect if estimate_tag_pose is set to True')
                 if tag_size==None:
                     raise Exception('tag_size must be provided to detect if estimate_tag_pose is set to True')

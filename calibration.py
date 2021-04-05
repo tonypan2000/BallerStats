@@ -101,30 +101,30 @@ def extrinsic_calibration():
     if ch == 27:
       break
 
-    # Use the center of the tags as image points. Make sure they correspond to the 3D points.
-    imagePoints = np.array([tag.center for tag in tags])
-    assert (len(tags) == 4)
-    print("Image Points: ", imagePoints)
-    success, rvec, tvec = cv2.solvePnP(objectPoints, np.array(imagePoints), camera_matrix, None)
-    rotation_matrix, _ = cv2.Rodrigues(rvec)
+  # Use the center of the tags as image points. Make sure they correspond to the 3D points.
+  imagePoints = np.array([tag.center for tag in tags])
+  assert (len(tags) == 4)
+  print("Image Points: ", imagePoints)
+  success, rvec, tvec = cv2.solvePnP(objectPoints, np.array(imagePoints), camera_matrix, None)
+  rotation_matrix, _ = cv2.Rodrigues(rvec)
 
-    affine_transformation = np.array([[rotation_matrix[0][0], rotation_matrix[0][1], rotation_matrix[0][2], tvec[0]],
-                                      [rotation_matrix[1][0], rotation_matrix[1][1], rotation_matrix[1][2], tvec[1]],
-                                      [rotation_matrix[2][0], rotation_matrix[2][1], rotation_matrix[2][2], tvec[2]],
-                                      [0.0, 0.0, 0.0, 1.0]], dtype='float')
-    # homogeneous matrix from camera coordinates to camera coordinates
-    extrinsic = np.linalg.inv(affine_transformation)
-    print("extrinsic: ", extrinsic)
+  affine_transformation = np.array([[rotation_matrix[0][0], rotation_matrix[0][1], rotation_matrix[0][2], tvec[0]],
+                                    [rotation_matrix[1][0], rotation_matrix[1][1], rotation_matrix[1][2], tvec[1]],
+                                    [rotation_matrix[2][0], rotation_matrix[2][1], rotation_matrix[2][2], tvec[2]],
+                                    [0.0, 0.0, 0.0, 1.0]], dtype='float')
+  # homogeneous matrix from camera coordinates to camera coordinates
+  extrinsic = np.linalg.inv(affine_transformation)
+  print("extrinsic: ", extrinsic)
 
-    for tag in tags:
-      homo = np.array([[tag.pose_R[0][0], tag.pose_R[0][1], tag.pose_R[0][2], tag.pose_t[0]],
-                       [tag.pose_R[1][0], tag.pose_R[1][1], tag.pose_R[1][2], tag.pose_t[1]],
-                       [tag.pose_R[2][0], tag.pose_R[2][1], tag.pose_R[2][2], tag.pose_t[2]],
-                       [0.0, 0.0, 0.0, 1.0]], dtype='float')
-      tag_pose = np.matmul(homo, np.array([0, 0, 0.0125, 1]))
-      arm_pose = np.matmul(extrinsic, tag_pose)
-      print("true pose", arm_pose)
-    np.savetxt("extrinsics.cfg", extrinsic)
+  for tag in tags:
+    homo = np.array([[tag.pose_R[0][0], tag.pose_R[0][1], tag.pose_R[0][2], tag.pose_t[0]],
+                     [tag.pose_R[1][0], tag.pose_R[1][1], tag.pose_R[1][2], tag.pose_t[1]],
+                     [tag.pose_R[2][0], tag.pose_R[2][1], tag.pose_R[2][2], tag.pose_t[2]],
+                     [0.0, 0.0, 0.0, 1.0]], dtype='float')
+    tag_pose = np.matmul(homo, np.array([0, 0, 0.0125, 1]))
+    arm_pose = np.matmul(extrinsic, tag_pose)
+    print("true pose", arm_pose)
+  np.savetxt("extrinsics.cfg", extrinsic)
 
 
 if __name__ == "__main__":
