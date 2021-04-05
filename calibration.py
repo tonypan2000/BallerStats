@@ -72,7 +72,7 @@ def extrinsic_calibration():
   # [fx, fy, cx, cy]
   camera_param = np.array([camera_matrix[0, 0], camera_matrix[1, 1], camera_matrix[0, 2], camera_matrix[1, 2]])
   # 3D coordinates of the center of AprilTags in the arm frame in meters.
-  #           x         y           z (meters in Cozmo camera coordinate frame)
+  #                         x         y           z (meters in Cozmo camera coordinate frame)
   objectPoints = np.array([[0.15, 0.0254 / 2, 3 * 0.0254 / 2],
                            [0.15 + 0.0254, -0.0254 / 2, 3 * 0.0254 / 2],
                            [0.15, 0.0254 / 2, 0.0254 / 2],
@@ -112,7 +112,7 @@ def extrinsic_calibration():
                                       [rotation_matrix[1][0], rotation_matrix[1][1], rotation_matrix[1][2], tvec[1]],
                                       [rotation_matrix[2][0], rotation_matrix[2][1], rotation_matrix[2][2], tvec[2]],
                                       [0.0, 0.0, 0.0, 1.0]], dtype='float')
-    # homogeneous matrix from camera coordinates to robot coordinates
+    # homogeneous matrix from camera coordinates to camera coordinates
     extrinsic = np.linalg.inv(affine_transformation)
     print("extrinsic: ", extrinsic)
 
