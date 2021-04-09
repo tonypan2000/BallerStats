@@ -1,2 +1,4 @@
 .idea
 *.webm
+url.txt
+__pycache__/
