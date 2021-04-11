@@ -27,10 +27,10 @@ def get_tag_pose():
                                 [tag.pose_R[1][0], tag.pose_R[1][1], tag.pose_R[1][2], tag.pose_t[1]],
                                 [tag.pose_R[2][0], tag.pose_R[2][1], tag.pose_R[2][2], tag.pose_t[2]],
                                 [0.0, 0.0, 0.0, 1.0]], dtype='float')
-            tag_pose = np.matmul(rot_mat, np.array([0, 0.0125, 0.0125, 1]))
-            world_pose = np.matmul(extrinsic_matrix, tag_pose)
+            world_pose = np.matmul(extrinsic_matrix, rot_mat)
+            world_coord = np.array([world_pose[0, 3], world_pose[1, 3], world_pose[2, 3]])
             # label the id of AprilTag on the image.
-            cv2.putText(gray, str(world_pose),
+            cv2.putText(gray, str(world_coord),
                         org=(tag.corners[0, 0].astype(int) + 10, tag.corners[0, 1].astype(int) + 10),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                         fontScale=0.3,
