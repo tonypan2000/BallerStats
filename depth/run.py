@@ -1,11 +1,11 @@
 """Compute depth maps for images in the input folder.
 """
-import os
+import argparse
+import cv2
 import glob
+import os
 import torch
 import utils
-import cv2
-import argparse
 
 from torchvision.transforms import Compose
 from midas.midas_net import MidasNet
@@ -82,7 +82,6 @@ def run(input_path, output_path, model_path, model_type="large", optimize=True):
         print("  processing {} ({}/{})".format(img_name, ind + 1, num_images))
 
         # input
-
         img = utils.read_image(img_name)
         img_input = transform({"image": img})["image"]
 
