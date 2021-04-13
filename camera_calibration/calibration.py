@@ -131,7 +131,7 @@ if __name__ == "__main__":
   # create main window
   cv2.namedWindow("frame", 1)
 
-  # intrinsic_calibration()
-  extrinsic_calibration()
+  intrinsic_calibration()
+  # extrinsic_calibration()
 
   cv2.destroyAllWindows()
