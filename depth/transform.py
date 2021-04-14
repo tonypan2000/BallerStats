@@ -4,7 +4,7 @@ import numpy as np
 
 class DepthTracker:
     def __init__(self, intrinsic_matrix, coordinates, depths):
-        self.intrinsic_matrix = intrinsic_matrix
+        self.intrinsic_matrix = np.linalg.inv(intrinsic_matrix)
         self.coordinates = coordinates
         self.depths = depths
 
@@ -27,11 +27,12 @@ class DepthTracker:
         camera_coords = np.array([[center_x], [center_y], [1]])
 
         world_pose = np.matmul(self.intrinsic_matrix, camera_coords)
-        return np.array([world_pose[0, 0] / 100000, world_pose[1, 0] / 100000, depth])
+        return np.array([world_pose[0, 0] / 100, world_pose[1, 0] / 100, depth])
 
 
 if __name__ == "__main__":
-    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics.cfg')
+    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics.cfg') / 1000
+    intrinsic_matrix[2, 2] = 1
     depth_tracker = DepthTracker(intrinsic_matrix, [], [])
 
     prev_coords = None
