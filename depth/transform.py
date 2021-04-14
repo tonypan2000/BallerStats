@@ -4,6 +4,8 @@ import numpy as np
 
 class DepthTracker:
     def __init__(self, intrinsic_matrix, coordinates, depths):
+        intrinsic_matrix /= 1000
+        intrinsic_matrix[2, 2] = 1
         self.intrinsic_matrix = np.linalg.inv(intrinsic_matrix)
         self.coordinates = coordinates
         self.depths = depths
@@ -31,8 +33,7 @@ class DepthTracker:
 
 
 if __name__ == "__main__":
-    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics.cfg') / 1000
-    intrinsic_matrix[2, 2] = 1
+    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics.cfg')
     depth_tracker = DepthTracker(intrinsic_matrix, [], [])
 
     prev_coords = None
