@@ -21,8 +21,8 @@ if __name__ == "__main__":
   while cap.isOpened():
     img_name = 0
     ret, frame = cap.read()
-    img = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     if ret:
+      img = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
       count += fps
       cap.set(1, count)
       x1, y1 = tracker_person.track(img)
@@ -30,9 +30,12 @@ if __name__ == "__main__":
       if x1 is not None and x2 is not None:
         coords = depth_tracker.get_coordinates(str(img_name), x1, y1, x2, y2, video_name)
         dist = depth_tracker.compute_dist(coords)
-        print(dist)
+        print(f"in image {img_name} richard is at {coords}")
+        print('dist from prev frame', dist)
         dist_traveled += dist
       img_name += 1
     else:
       cap.release()
       break
+  cv2.destroyAllWindows()
+  print(dist_traveled)
