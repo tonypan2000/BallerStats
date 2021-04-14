@@ -13,85 +13,89 @@ from midas.midas_net_custom import MidasNet_small
 from midas.transforms import Resize, NormalizeImage, PrepareForNet
 
 
-def run(input_path, output_path, model_path, model_type="large", optimize=True):
-    """Run MonoDepthNN to compute depth maps.
+class DepthPredictor:
+    def __init__(self, model_type, model_path, optimize):
+        print("initialize")
 
-    Args:
-        input_path (str): path to input folder
-        output_path (str): path to output folder
-        model_path (str): path to saved model
-    """
-    print("initialize")
+        # select device
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print("device: %s" % self.device)
 
-    # select device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("device: %s" % device)
+        # load network
+        if model_type == "large":
+            self.model = MidasNet(model_path, non_negative=True)
+            self.net_w, self.net_h = 384, 384
+        elif model_type == "small":
+            self.model = MidasNet_small(model_path, features=64, backbone="efficientnet_lite3", exportable=True,
+                                   non_negative=True, blocks={'expand': True})
+            self.net_w, self.net_h = 256, 256
+        else:
+            print(f"model_type '{model_type}' not implemented, use: --model_type large")
+            assert False
 
-    # load network
-    if model_type == "large":
-        model = MidasNet(model_path, non_negative=True)
-        net_w, net_h = 384, 384
-    elif model_type == "small":
-        model = MidasNet_small(model_path, features=64, backbone="efficientnet_lite3", exportable=True, non_negative=True, blocks={'expand': True})
-        net_w, net_h = 256, 256
-    else:
-        print(f"model_type '{model_type}' not implemented, use: --model_type large")
-        assert False
-    
-    transform = Compose(
-        [
-            Resize(
-                net_w,
-                net_h,
-                resize_target=None,
-                keep_aspect_ratio=True,
-                ensure_multiple_of=32,
-                resize_method="upper_bound",
-                image_interpolation_method=cv2.INTER_CUBIC,
-            ),
-            NormalizeImage(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            PrepareForNet(),
-        ]
-    )
+        self.transform = Compose(
+            [
+                Resize(
+                    self.net_w,
+                    self.net_h,
+                    resize_target=None,
+                    keep_aspect_ratio=True,
+                    ensure_multiple_of=32,
+                    resize_method="upper_bound",
+                    image_interpolation_method=cv2.INTER_CUBIC,
+                ),
+                NormalizeImage(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                PrepareForNet(),
+            ]
+        )
 
-    model.eval()
-    
-    if optimize==True:
-        rand_example = torch.rand(1, 3, net_h, net_w)
-        model(rand_example)
-        traced_script_module = torch.jit.trace(model, rand_example)
-        model = traced_script_module
-    
-        if device == torch.device("cuda"):
-            model = model.to(memory_format=torch.channels_last)  
-            model = model.half()
+        self.model.eval()
+        self.optimize = optimize
+        if self.optimize:
+            rand_example = torch.rand(1, 3, self.net_h, self.net_w)
+            self.model(rand_example)
+            traced_script_module = torch.jit.trace(self.model, rand_example)
+            self.model = traced_script_module
 
-    model.to(device)
+            if self.device == torch.device("cuda"):
+                self.model = self.model.to(memory_format=torch.channels_last)
+                self.model = self.model.half()
 
-    # get input
-    img_names = glob.glob(os.path.join(input_path, "*"))
-    num_images = len(img_names)
+        self.model.to(self.device)
 
-    # create output folder
-    os.makedirs(output_path, exist_ok=True)
+    def process_video(self, filename, dir_name):
+        cap = cv2.VideoCapture(filename)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        count = 0
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if ret:
+                if len(frame.shape) == 2:
+                    img = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+                img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) / 255.0
+                prediction = self.process_images(img)
+                # output
+                out_filename = os.path.join(
+                    dir_name, str(count / 30)[0]
+                )
+                utils.write_depth(out_filename, prediction, bits=2)
 
-    print("start processing")
+                count += fps
+                cap.set(1, count)
+            else:
+                cap.release()
+                break
 
-    for ind, img_name in enumerate(img_names):
-
-        print("  processing {} ({}/{})".format(img_name, ind + 1, num_images))
-
-        # input
-        img = utils.read_image(img_name)
-        img_input = transform({"image": img})["image"]
+    def process_images(self, img):
+        img_input = self.transform({"image": img})["image"]
 
         # compute
         with torch.no_grad():
-            sample = torch.from_numpy(img_input).to(device).unsqueeze(0)
-            if optimize==True and device == torch.device("cuda"):
-                sample = sample.to(memory_format=torch.channels_last)  
+            sample = torch.from_numpy(img_input).to(self.device).unsqueeze(0)
+            if self.optimize and self.device == torch.device("cuda"):
+                sample = sample.to(memory_format=torch.channels_last)
                 sample = sample.half()
-            prediction = model.forward(sample)
+            prediction = self.model.forward(sample)
             prediction = (
                 torch.nn.functional.interpolate(
                     prediction.unsqueeze(1),
@@ -99,16 +103,48 @@ def run(input_path, output_path, model_path, model_type="large", optimize=True):
                     mode="bicubic",
                     align_corners=False,
                 )
-                .squeeze()
-                .cpu()
-                .numpy()
+                    .squeeze()
+                    .cpu()
+                    .numpy()
             )
 
-        # output
-        filename = os.path.join(
-            output_path, os.path.splitext(os.path.basename(img_name))[0]
-        )
-        utils.write_depth(filename, prediction, bits=2)
+        return prediction
+
+def run(input_path, output_path, model_path, model_type="large", optimize=True, input_video=True):
+    """Run MonoDepthNN to compute depth maps.
+
+    Args:
+        input_path (str): path to input folder
+        output_path (str): path to output folder
+        model_path (str): path to saved model
+    """
+    predictor = DepthPredictor(model_type, model_path, optimize)
+
+    # get input
+    print("start processing")
+    if input_video:
+        vid_names = glob.glob(os.path.join(input_path, "*.mp4"))
+        for ind, vid_name in enumerate(vid_names):
+            dir_name = os.path.join(output_path, os.path.splitext(os.path.basename(vid_name))[0])
+            os.makedirs(dir_name, exist_ok=True)
+            predictor.process_video(vid_name, dir_name)
+    else:
+        img_names = glob.glob(os.path.join(input_path, "*"))
+        num_images = len(img_names)
+        # create output folder
+        os.makedirs(output_path, exist_ok=True)
+
+        for ind, img_name in enumerate(img_names):
+            print("  processing {} ({}/{})".format(img_name, ind + 1, num_images))
+            # input
+            img = utils.read_image(img_name)
+            prediction = predictor.process_images(img)
+
+            # output
+            filename = os.path.join(
+                output_path, os.path.splitext(os.path.basename(img_name))[0]
+            )
+            utils.write_depth(filename, prediction, bits=2)
 
     print("finished")
 
@@ -136,6 +172,10 @@ if __name__ == "__main__":
         help='model type: large or small'
     )
 
+    parser.add_argument('-v', dest='input_type', action='store_true')
+    parser.add_argument('-p', dest='input_type', action='store_false')
+    parser.set_defaults(input_type=True)
+
     parser.add_argument('--optimize', dest='optimize', action='store_true')
     parser.add_argument('--no-optimize', dest='optimize', action='store_false')
     parser.set_defaults(optimize=True)
@@ -147,4 +187,4 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = True
 
     # compute depth maps
-    run(args.input_path, args.output_path, args.model_weights, args.model_type, args.optimize)
+    run(args.input_path, args.output_path, args.model_weights, args.model_type, args.optimize, args.input_type)
