@@ -6,7 +6,8 @@ import tracking
 
 
 if __name__ == "__main__":
-  video_name = 'PXL_20210411_182507574'
+  # video_name = 'PXL_20210411_182507574'
+  video_name = 'PXL_20210411_182738885'
   input_video = os.path.join('depth', 'input', video_name + '.mp4')
   cap = cv2.VideoCapture(input_video)
   fps = cap.get(cv2.CAP_PROP_FPS)

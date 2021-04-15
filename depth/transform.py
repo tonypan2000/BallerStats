@@ -6,9 +6,10 @@ import numpy as np
 
 class DepthTracker:
     def __init__(self, intrinsic_matrix, coordinate=None):
-        intrinsic_matrix /= 1000
-        intrinsic_matrix[2, 2] = 1
-        self.intrinsic_matrix = np.linalg.inv(intrinsic_matrix)
+        self.fx = intrinsic_matrix[0, 0]
+        self.fy = intrinsic_matrix[1, 1]
+        self.cx = intrinsic_matrix[0, 2]
+        self.cy = intrinsic_matrix[1, 2]
         self.coordinate = coordinate
 
     def compute_dist(self, new_coord):
@@ -33,10 +34,10 @@ class DepthTracker:
         depth_map = inverted_disparity * scaling_constant
         depth = depth_map[y1, x1]
         print(f"depth at center: {depth}")
-        camera_coords = np.array([[x1], [y1], [1]])
 
-        world_pose = np.matmul(self.intrinsic_matrix, camera_coords)
-        result = np.array([world_pose[0, 0] / 100, world_pose[1, 0] / 100, depth])
+        x = (x1 - self.cx) * depth / self.fx
+        y = (y1 - self.cy) * depth / self.fy
+        result = np.array([x, y, depth])
         return result
 
     def get_coords_bb(self, img_name):
