@@ -27,8 +27,8 @@ class DepthTracker:
             disparity = cv2.resize(cv2.imread(filename, cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
         else:
             disparity = cv2.resize(cv2.imread(f'./output/{img_name}.png', cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
-
-        depth = 2.0 / height_pixels * self.fy
+        human_height = 2.0
+        depth = human_height / height_pixels * self.fy
         print(f"depth at center: {depth}")
 
         x = (x1 - self.cx) * depth / self.fx
