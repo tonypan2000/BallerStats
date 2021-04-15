@@ -3,7 +3,10 @@
 ## Requirements
 
 Python 3
+pip install -r requirements.txt
 
 ## Usage
 
-pip install -r requirements.txt
+```bash
+python main.py
+```
