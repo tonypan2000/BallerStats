@@ -12,8 +12,8 @@ if __name__ == "__main__":
   cap = cv2.VideoCapture(input_video)
   fps = cap.get(cv2.CAP_PROP_FPS)
   count = 0
-  tracker_person = tracking.MIL_tracker()
-  tracker_landmark = tracking.MIL_tracker()
+  tracker_person = tracking.CSRT_Tracker()
+  tracker_landmark = tracking.CSRT_Tracker()
 
   intrinsic_matrix = np.loadtxt(os.path.join('camera_calibration', 'intrinsics.cfg'))
   depth_tracker = transform.DepthTracker(intrinsic_matrix)

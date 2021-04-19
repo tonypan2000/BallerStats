@@ -1,7 +1,7 @@
 import cv2
 
 
-class MIL_tracker():
+class CSRT_Tracker():
   def __init__(self):
     self.tracker = cv2.TrackerCSRT_create()
     self.bounding_box = None
@@ -22,7 +22,7 @@ class MIL_tracker():
 
 def track_bb(input_video):
   video_stream = cv2.VideoCapture(input_video)
-  tracker = MIL_tracker()
+  tracker = CSRT_Tracker()
   while True:
     frame = video_stream.read()[1]
     tracker.track(frame)
