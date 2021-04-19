@@ -3,7 +3,7 @@ import cv2
 
 class MIL_tracker():
   def __init__(self):
-    self.tracker = cv2.TrackerMIL_create()
+    self.tracker = cv2.TrackerCSRT_create()
     self.bounding_box = None
 
   def track(self, frame):
