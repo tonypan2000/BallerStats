@@ -8,6 +8,7 @@ class CSRT_Tracker():
 
   def track(self, frame):
     x, y = None, None
+
     if self.bounding_box is not None:
       (success, box) = self.tracker.update(frame)
       if success:
@@ -30,5 +31,5 @@ def track_bb(input_video):
 
 if __name__ == "__main__":
   # create main window
-  track_bb("Venice-2-raw.webm")
+  track_bb("/Users/robertbuckley/Documents/BallerStats/depth/input/PXL_20210418_183745902.mp4")
   cv2.destroyAllWindows()
