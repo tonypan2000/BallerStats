@@ -1,16 +1,23 @@
 from apriltags3 import Detector
-from calibration import get_video_stream
+from calibration import get_video_stream, compute_transformation
 import cv2
 import numpy as np
 
 
-def get_tag_pose():
+object_points = np.array([[0.15, 0.0254 / 2, 3 * 0.0254 / 2],
+                           [0.15 + 0.0254, -0.0254 / 2, 3 * 0.0254 / 2],
+                           [0.15, 0.0254 / 2, 0.0254 / 2],
+                           [0.15 + 0.0254, -0.0254 / 2, 0.0254 / 2]])
+
+def eval():
     camera_matrix = np.loadtxt('intrinsics.cfg')
     # [fx, fy, cx, cy]
     camera_param = np.array([camera_matrix[0, 0], camera_matrix[1, 1], camera_matrix[0, 2], camera_matrix[1, 2]])
     extrinsic_matrix = np.loadtxt('extrinsics.cfg')
     detector = Detector("tagStandard41h12", quad_decimate=2.0, quad_sigma=1.0, debug=False)
     ipcam = get_video_stream()
+    errors = []
+    lengths = []
     while True:
         ch = 0xFF & cv2.waitKey(1)
         frame = ipcam.get_image()
@@ -23,12 +30,7 @@ def get_tag_pose():
                 cv2.line(gray, tuple(tag.corners[idx - 1, :].astype(int)),
                          tuple(tag.corners[idx, :].astype(int)), (255, 0, 0))
 
-            rot_mat = np.array([[tag.pose_R[0][0], tag.pose_R[0][1], tag.pose_R[0][2], tag.pose_t[0]],
-                                [tag.pose_R[1][0], tag.pose_R[1][1], tag.pose_R[1][2], tag.pose_t[1]],
-                                [tag.pose_R[2][0], tag.pose_R[2][1], tag.pose_R[2][2], tag.pose_t[2]],
-                                [0.0, 0.0, 0.0, 1.0]], dtype='float')
-            world_pose = np.matmul(extrinsic_matrix, rot_mat)
-            world_coord = np.array([world_pose[0, 3], world_pose[1, 3], world_pose[2, 3]])
+            world_coord = compute_transformation(tag, extrinsic_matrix)
             # label the id of AprilTag on the image.
             cv2.putText(gray, str(world_coord),
                         org=(tag.corners[0, 0].astype(int) + 10, tag.corners[0, 1].astype(int) + 10),
@@ -37,6 +39,23 @@ def get_tag_pose():
                         color=(255, 0, 0))
 
         cv2.imshow('frame', gray)
+
+        for i, tag in enumerate(tags):
+          world_coord = compute_transformation(tag, extrinsic_matrix)
+          dist = np.linalg.norm(object_points[i])
+          lengths.append(dist)
+          abs_diff = abs(np.linalg.norm(object_points[i] - world_coord))
+          errors.append(abs_diff)
+          percent_diff = abs_diff / np.linalg.norm(world_coord)
+          print('tag', i)
+          print('ground truth', object_points[i])
+          print('estimated', world_coord)
+          print('abs diff', abs_diff)
+          print('percent diff', percent_diff)
+          print('-------')
+        avg_err = sum(errors) / 4
+        print('avg abs err', avg_err)
+        print('avg percent err', avg_err / sum(lengths))
         # continue until ESC
         if ch == 27:
             break
@@ -44,5 +63,5 @@ def get_tag_pose():
 if __name__ == "__main__":
     # create main window
     cv2.namedWindow("frame", 1)
-    get_tag_pose()
+    eval()
     cv2.destroyAllWindows()

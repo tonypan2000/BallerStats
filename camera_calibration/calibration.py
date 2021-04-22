@@ -10,6 +10,15 @@ def get_video_stream():
   ipcam = IPWEBCAM(url)
   return ipcam
 
+def compute_transformation(tag, extrinsics):
+  rot_mat = np.array([[tag.pose_R[0][0], tag.pose_R[0][1], tag.pose_R[0][2], tag.pose_t[0]],
+                      [tag.pose_R[1][0], tag.pose_R[1][1], tag.pose_R[1][2], tag.pose_t[1]],
+                      [tag.pose_R[2][0], tag.pose_R[2][1], tag.pose_R[2][2], tag.pose_t[2]],
+                      [0.0, 0.0, 0.0, 1.0]], dtype='float')
+  world_pose = np.matmul(extrinsics, rot_mat)
+  world_coord = np.array([world_pose[0, 3], world_pose[1, 3], world_pose[2, 3]])
+  return world_coord
+
 def intrinsic_calibration():
   font = cv2.FONT_HERSHEY_SIMPLEX
   h = 480
@@ -113,18 +122,13 @@ def extrinsic_calibration():
                                     [rotation_matrix[2][0], rotation_matrix[2][1], rotation_matrix[2][2], tvec[2]],
                                     [0.0, 0.0, 0.0, 1.0]], dtype='float')
   # homogeneous matrix from camera coordinates to camera coordinates
-  extrinsic = np.linalg.inv(affine_transformation)
-  print("extrinsic: ", extrinsic)
+  extrinsics = np.linalg.inv(affine_transformation)
+  print("extrinsics: ", extrinsics)
 
   for tag in tags:
-    homo = np.array([[tag.pose_R[0][0], tag.pose_R[0][1], tag.pose_R[0][2], tag.pose_t[0]],
-                     [tag.pose_R[1][0], tag.pose_R[1][1], tag.pose_R[1][2], tag.pose_t[1]],
-                     [tag.pose_R[2][0], tag.pose_R[2][1], tag.pose_R[2][2], tag.pose_t[2]],
-                     [0.0, 0.0, 0.0, 1.0]], dtype='float')
-    world_pose = np.matmul(extrinsic, homo)
-    world_coord = np.array([world_pose[0, 3], world_pose[1, 3], world_pose[2, 3]])
+    world_coord = compute_transformation(tag, extrinsics)
     print("true pose", world_coord)
-  np.savetxt("extrinsics.cfg", extrinsic)
+  np.savetxt("extrinsics.cfg", extrinsics)
 
 
 if __name__ == "__main__":
