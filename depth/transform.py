@@ -21,14 +21,13 @@ class DepthTracker:
         self.coordinate = new_coord
         return dist
 
-    def get_coordinates(self, img_name, x1, y1, x2, y2, vid_name=None):
+    def get_coordinates(self, img_name, x1, y1, x2, y2, dist_to_point=2, vid_name=None):
         if vid_name is not None:
             filename = os.path.join('depth', 'output', vid_name, img_name + '.png')
             disparity = cv2.resize(cv2.imread(filename, cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
         else:
             disparity = cv2.resize(cv2.imread(f'./output/{img_name}.png', cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
 
-        dist_to_point = 2
         inverted_disparity = np.float64(1.0) / disparity
         scaling_constant = dist_to_point / inverted_disparity[y2, x2]
 
