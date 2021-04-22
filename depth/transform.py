@@ -7,10 +7,10 @@ import numpy as np
 class DepthTracker:
     def __init__(self, intrinsic_matrix, scale_factor=1.0, coordinate=None):
         self.scale_factor = scale_factor
-        self.fx = intrinsic_matrix[0, 0] * scale_factor
-        self.fy = intrinsic_matrix[1, 1] * scale_factor
-        self.cx = intrinsic_matrix[0, 2] * scale_factor
-        self.cy = intrinsic_matrix[1, 2] * scale_factor
+        self.fx = intrinsic_matrix[0, 0] * 2.0 * scale_factor
+        self.fy = intrinsic_matrix[1, 1] * 2.0 * scale_factor
+        self.cx = intrinsic_matrix[0, 2] * 2.0 * scale_factor
+        self.cy = intrinsic_matrix[1, 2] * 2.0 * scale_factor
         self.coordinate = coordinate
 
     def compute_dist(self, new_coord):
@@ -28,12 +28,10 @@ class DepthTracker:
         else:
             disparity = cv2.resize(cv2.imread(f'./output/{img_name}.png', cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
 
-        dist_to_point = 2
-        inverted_disparity = np.float64(1.0) / disparity
-        scaling_constant = dist_to_point / inverted_disparity[y2, x2]
-
-        depth_map = inverted_disparity * scaling_constant
-        depth = depth_map[y1, x1]
+        depthHoop = 13.1
+        disparityBaller = disparity[y1, x1]
+        disparityHoop = disparity[y2, x2]
+        depth = depthHoop * disparityHoop / disparityBaller
         print(f"depth at center: {depth}")
 
         x = (x1 - self.cx) * depth / self.fx
@@ -52,8 +50,11 @@ class DepthTracker:
         return self.get_coordinates(img_name, center_x, center_y, x1, y1)
 
 
+
+
+
 if __name__ == "__main__":
-    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics.cfg')
+    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics_landscape.cfg')
     depth_tracker = DepthTracker(intrinsic_matrix, scale_factor=0.25)
 
     prev_coords = None
