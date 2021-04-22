@@ -21,14 +21,7 @@ class DepthTracker:
         self.coordinate = new_coord
         return dist
 
-    def get_coordinates(self, img_name, x1, y1, height_pixels, vid_name=None):
-        if vid_name is not None:
-            filename = os.path.join('depth', 'output', vid_name, img_name + '.png')
-            disparity = cv2.resize(cv2.imread(filename, cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
-        else:
-            disparity = cv2.resize(cv2.imread(f'./output/{img_name}.png', cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
-        human_height = 2.0
-        depth = human_height / height_pixels * self.fy
+    def get_coordinates(self, x1, y1, depth):
         print(f"depth at center: {depth}")
 
         x = (x1 - self.cx) * depth / self.fx
@@ -40,7 +33,7 @@ class DepthTracker:
         input_img = cv2.resize(cv2.imread(f"./input/{img_name}.jpg"), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
         bounding_box = cv2.selectROI('frame', input_img, fromCenter=False, showCrosshair=True)
         center_x, center_y, height_pixels = bounding_box[0], bounding_box[1], bounding_box[3]
-        return self.get_coordinates(img_name, center_x, center_y, height_pixels)
+        return self.get_coordinates(center_x, center_y, 7.38)
 
 
 if __name__ == "__main__":
@@ -48,7 +41,7 @@ if __name__ == "__main__":
     depth_tracker = DepthTracker(intrinsic_matrix, scale_factor=0.25)
 
     prev_coords = None
-    for image in ["PXL_20210411_182359897", "PXL_20210411_182404641"]:
+    for image in ["PXL_20210418_183601908", "PXL_20210418_183618429"]:
         coords = depth_tracker.get_coords_bb(image)  # 6.63
         print(f"in image {image} richard is at {coords}")
         if prev_coords is not None:
