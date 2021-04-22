@@ -15,7 +15,7 @@ class CSRT_Tracker():
         (x, y, w, h) = [int(v) for v in box]
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
       cv2.imshow('frame', frame)
-      cv2.waitKey(0)
+      cv2.waitKey(1)
     else:
       self.bounding_box = cv2.selectROI('frame', frame, fromCenter=False, showCrosshair=True)
       self.tracker.init(frame, self.bounding_box)
@@ -31,5 +31,5 @@ def track_bb(input_video):
 
 if __name__ == "__main__":
   # create main window
-  track_bb("/Users/robertbuckley/Documents/BallerStats/depth/input/PXL_20210418_183745902.mp4")
+  track_bb("./depth/input/PXL_20210418_183745902.mp4")
   cv2.destroyAllWindows()
