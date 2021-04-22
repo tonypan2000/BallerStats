@@ -4,10 +4,10 @@ import cv2
 import numpy as np
 
 
-object_points = np.array([[0.15, 0.0254 / 2, 3 * 0.0254 / 2],
-                           [0.15 + 0.0254, -0.0254 / 2, 3 * 0.0254 / 2],
-                           [0.15, 0.0254 / 2, 0.0254 / 2],
-                           [0.15 + 0.0254, -0.0254 / 2, 0.0254 / 2]])
+object_points = np.array([[0.2, 0.0254 / 2, 3 * 0.0254 / 2],
+                           [0.2 + 0.0254, -0.0254 / 2, 3 * 0.0254 / 2],
+                           [0.2, 0.0254 / 2, 0.0254 / 2],
+                           [0.2 + 0.0254, -0.0254 / 2, 0.0254 / 2]])
 
 def eval():
     camera_matrix = np.loadtxt('intrinsics.cfg')
@@ -40,22 +40,24 @@ def eval():
 
         cv2.imshow('frame', gray)
 
-        for i, tag in enumerate(tags):
-          world_coord = compute_transformation(tag, extrinsic_matrix)
-          dist = np.linalg.norm(object_points[i])
-          lengths.append(dist)
-          abs_diff = abs(np.linalg.norm(object_points[i] - world_coord))
-          errors.append(abs_diff)
-          percent_diff = abs_diff / np.linalg.norm(world_coord)
-          print('tag', i)
-          print('ground truth', object_points[i])
-          print('estimated', world_coord)
-          print('abs diff', abs_diff)
-          print('percent diff', percent_diff)
-          print('-------')
-        avg_err = sum(errors) / 4
-        print('avg abs err', avg_err)
-        print('avg percent err', avg_err / sum(lengths))
+        # space key
+        if ch == 32:
+            for i, tag in enumerate(tags):
+              world_coord = compute_transformation(tag, extrinsic_matrix)
+              dist = np.linalg.norm(object_points[i])
+              lengths.append(dist)
+              abs_diff = abs(np.linalg.norm(object_points[i] - world_coord))
+              errors.append(abs_diff)
+              percent_diff = abs_diff / np.linalg.norm(world_coord)
+              print('tag', i)
+              print('ground truth', object_points[i])
+              print('estimated', world_coord)
+              print('abs diff', abs_diff)
+              print('percent diff', percent_diff)
+              print('-------')
+            avg_err = sum(errors) / 4
+            print('avg abs err', avg_err)
+            print('avg percent err', avg_err / sum(lengths))
         # continue until ESC
         if ch == 27:
             break

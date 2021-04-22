@@ -82,10 +82,10 @@ def extrinsic_calibration():
   camera_param = np.array([camera_matrix[0, 0], camera_matrix[1, 1], camera_matrix[0, 2], camera_matrix[1, 2]])
   # 3D coordinates of the center of AprilTags in the arm frame in meters.
   #                         x         y           z (meters in Cozmo camera coordinate frame)
-  objectPoints = np.array([[0.15, 0.0254 / 2, 3 * 0.0254 / 2],
-                           [0.15 + 0.0254, -0.0254 / 2, 3 * 0.0254 / 2],
-                           [0.15, 0.0254 / 2, 0.0254 / 2],
-                           [0.15 + 0.0254, -0.0254 / 2, 0.0254 / 2]])
+  object_points = np.array([[0.2, 0.0254 / 2, 3 * 0.0254 / 2],
+                            [0.2 + 0.0254, -0.0254 / 2, 3 * 0.0254 / 2],
+                            [0.2, 0.0254 / 2, 0.0254 / 2],
+                            [0.2 + 0.0254, -0.0254 / 2, 0.0254 / 2]])
   detector = Detector("tagStandard41h12", quad_decimate=2.0, quad_sigma=1.0, debug=False)
   ipcam = get_video_stream()
   while True:
@@ -111,10 +111,10 @@ def extrinsic_calibration():
       break
 
   # Use the center of the tags as image points. Make sure they correspond to the 3D points.
-  imagePoints = np.array([tag.center for tag in tags])
+  image_points = np.array([tag.center for tag in tags])
   assert (len(tags) == 4)
-  print("Image Points: ", imagePoints)
-  success, rvec, tvec = cv2.solvePnP(objectPoints, np.array(imagePoints), camera_matrix, None)
+  print("Image Points: ", image_points)
+  success, rvec, tvec = cv2.solvePnP(object_points, np.array(image_points), camera_matrix, None)
   rotation_matrix, _ = cv2.Rodrigues(rvec)
 
   affine_transformation = np.array([[rotation_matrix[0][0], rotation_matrix[0][1], rotation_matrix[0][2], tvec[0]],
@@ -135,7 +135,7 @@ if __name__ == "__main__":
   # create main window
   cv2.namedWindow("frame", 1)
 
-  intrinsic_calibration()
-  # extrinsic_calibration()
+  # intrinsic_calibration()
+  extrinsic_calibration()
 
   cv2.destroyAllWindows()
