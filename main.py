@@ -33,7 +33,7 @@ if __name__ == "__main__":
         currentFrame = img_name * fps
         cap.set(1, currentFrame)
         if x1 is not None and x2 is not None:
-          coords = depth_tracker.get_coordinates(str(img_name), x1, y1, x2, y2, 13.1191, video_name)
+          coords = depth_tracker.get_coordinates(str(img_name), x1, y1, x2, y2, video_name)
           dist = depth_tracker.compute_dist(coords)
           print(f"in image {img_name} richard is at {coords}")
           print('dist from prev frame', dist)

@@ -7,7 +7,7 @@ class CSRT_Tracker():
     self.bounding_box = None
 
   def track(self, frame):
-    x, y = None, None
+    x, y, w, h = None, None, None, None
 
     if self.bounding_box is not None:
       (success, box) = self.tracker.update(frame)
@@ -19,7 +19,8 @@ class CSRT_Tracker():
     else:
       self.bounding_box = cv2.selectROI('frame', frame, fromCenter=False, showCrosshair=True)
       self.tracker.init(frame, self.bounding_box)
-    return x, y
+      x, y, w, h = self.bounding_box
+    return x + w // 2,  y + h // 2
 
 def track_bb(input_video):
   video_stream = cv2.VideoCapture(input_video)

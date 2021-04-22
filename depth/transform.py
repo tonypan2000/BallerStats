@@ -21,7 +21,7 @@ class DepthTracker:
         self.coordinate = new_coord
         return dist
 
-    def get_coordinates(self, img_name, x1, y1, x2, y2, dist_to_point=2, vid_name=None):
+    def get_coordinates(self, img_name, x1, y1, x2, y2, vid_name=None):
         if vid_name is not None:
             filename = os.path.join('depth', 'output', vid_name, img_name + '.png')
             disparity = cv2.resize(cv2.imread(filename, cv2.IMREAD_GRAYSCALE), (0, 0), fx=self.scale_factor, fy=self.scale_factor)
@@ -47,9 +47,6 @@ class DepthTracker:
         bounding_box = cv2.selectROI('frame', input_img, fromCenter=False, showCrosshair=True)
         x1, y1 = bounding_box[0], bounding_box[1]
         return self.get_coordinates(img_name, center_x, center_y, x1, y1)
-
-
-
 
 
 if __name__ == "__main__":
