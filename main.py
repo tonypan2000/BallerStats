@@ -6,14 +6,13 @@ import tracking
 
 
 if __name__ == "__main__":
-  # video_name = 'PXL_20210411_182507574'
-  video_name = 'PXL_20210418_184103800'
+  video_name = 'PXL_20210418_183745902'
   input_video = os.path.join('depth', 'input', video_name + '.mp4')
   cap = cv2.VideoCapture(input_video)
   fps = cap.get(cv2.CAP_PROP_FPS)
   currentFrame = 0
   objectTrackerFramerate = 3
-  scaleFactor = 0.5
+  scaleFactor = 0.25
   tracker_person = tracking.CSRT_Tracker()
   tracker_landmark = tracking.CSRT_Tracker()
 
@@ -34,7 +33,7 @@ if __name__ == "__main__":
         currentFrame = img_name * fps
         cap.set(1, currentFrame)
         if x1 is not None and x2 is not None:
-          coords = depth_tracker.get_coordinates(str(img_name), x1, y1, x2, y2, video_name)
+          coords = depth_tracker.get_coordinates(str(img_name), x1, y1, x2, y2, 13.1191, video_name)
           dist = depth_tracker.compute_dist(coords)
           print(f"in image {img_name} richard is at {coords}")
           print('dist from prev frame', dist)
