@@ -53,7 +53,7 @@ class DepthTracker:
 
 
 if __name__ == "__main__":
-    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics_landscape.cfg')
+    intrinsic_matrix = np.loadtxt('../camera_calibration/intrinsics.cfg')
     depth_tracker = DepthTracker(intrinsic_matrix, scale_factor=0.25)
 
     prev_coords = None
