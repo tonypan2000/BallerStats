@@ -24,6 +24,11 @@ For depth prediction, see the [README](./depth/readme.md) inside the `depth` fol
 python main.py
 ```
 
+## Performance
+
+The camera calibration has an average absolute percent error of 11.78%, 
+the depth estimation has an average absolute percent error of 11.67%.
+
 ## Authors
 
 [Robert Buckley](https://github.com/robertbuckley), [Richard Guan](https://github.com/rguan72), [Jensen Hwa](https://github.com/jensenhwa), [Tony Pan](https://github.com/tonypan2000), [Calvin Zheng](https://github.com/calvin-zheng)

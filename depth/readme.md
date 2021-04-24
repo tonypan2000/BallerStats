@@ -44,3 +44,15 @@ This model is from the paper Towards Robust Monocular Depth Estimation: Mixing D
 	year      = {2020},
 }
 ```
+
+## Clarification
+
+All the files in this directory are imported from the repo cited above with the exceptions of:
+
+* [run.py](run.py) We modified the original script such that it can take videos as inputs
+
+* [transform.py](transform.py) is entirely written by us and uses camera parameters and depth disparities to convert
+from pixel to world coordinates.
+  
+* [evaluate_depth.py](evaluate_depth.py) is also entirely written by us as we use it to evaluate the accuracy of the 
+depth estimation.
