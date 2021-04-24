@@ -1,5 +1,7 @@
 # BallerStats
 
+Estimates distance traveled by a basketball player based on video footage
+
 ## Requirements
 
 Python 3
@@ -27,7 +29,11 @@ python main.py
 ## Performance
 
 The camera calibration has an average absolute percent error of 11.78%, 
-the depth estimation has an average absolute percent error of 11.67%.
+the depth estimation has an average absolute percent error of 11.67%. 
+Cumulatively, BallerStats has an average percent error of 46% with a 
+standard deviation of 17% on our BallerSet dataset. The model always overestimates
+the distance traveled.
+
 
 ## Authors
 

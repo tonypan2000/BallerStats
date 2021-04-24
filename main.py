@@ -6,7 +6,7 @@ from tracking import ObjectTracker
 
 
 if __name__ == "__main__":
-    video_name = 'PXL_20210418_183745902'
+    video_name = 'short3'
     input_video = os.path.join('depth', 'input', video_name + '.mp4')
     cap = cv2.VideoCapture(input_video)
     fps = round(cap.get(cv2.CAP_PROP_FPS))
@@ -33,6 +33,11 @@ if __name__ == "__main__":
 
     distances = []
     currentFrame = 0
+
+    # Define the codec and create VideoWriter object
+    fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+    out = cv2.VideoWriter(video_name + '.avi', fourcc, objectTrackerFPS, (960, 540))
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -54,6 +59,7 @@ if __name__ == "__main__":
         for (x1, y1, dist_traveled) in distances:
             cv2.putText(img, f"{dist_traveled:.1f}m", (x1, y1 - 5), cv2.FONT_HERSHEY_DUPLEX, 0.5, (255, 255, 255))
         cv2.imshow('BallerStats', img)
+        out.write(img)
         cv2.waitKey(1)
         # Run object tracker every few frames (skip ahead a few)
         currentFrame += fps / objectTrackerFPS

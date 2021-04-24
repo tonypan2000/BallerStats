@@ -40,4 +40,10 @@ Point your Android device at a checkerboard and gather images by pressing a spac
 
 3. Calibrate the extrinsic matrix by running extrinsic_calibration() in [calibration.py](calibration.py). Arrange at least 4 different April Tags in various poses and record their coordinates as objectPoints. When the camera can see all the April Tags, press ESC to calibrate. It saves the matrix to [extrinsics.cfg](extrinsics.cfg).
 
-4. Test your calibration by running [get_world_coords.py](get_world_coords.py) and point your phone at an arbitrary April Tag. It will annotate the world coordinate of the tag.
+4. Test your calibration by running [eval_calibration.py](eval_calibration.py) and point your phone at an arbitrary April Tag. It will annotate the world coordinate of the tag and calculate the different with respect to the ground truth values.
+
+## References
+
+* We used OpenCV for checkerboard camera calibration
+
+* We used [April Tags](https://april.eecs.umich.edu/papers/details.php?name=wang2016iros) for extrinsic calibration and evaluation of our camera parameters. [apriltags3.py](apriltags3.py) in this directory is obtained from the library, while everything else is authored by us.
