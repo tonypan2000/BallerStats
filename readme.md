@@ -4,11 +4,13 @@
 
 Python 3
 
+```bash
 pip install -r requirements.txt
+```
 
-For camera calibration, see the [README](./camera_calibration/README) inside the `camera_calibration` folder
+For camera calibration, see the [README](./camera_calibration/readme.md) inside the `camera_calibration` folder
 
-For depth prediction, see the [README](./depth/README) inside the `depth` folder
+For depth prediction, see the [README](./depth/readme.md) inside the `depth` folder
 
 ## Usage
 
