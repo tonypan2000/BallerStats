@@ -12,12 +12,24 @@ conda install -c pytorch torchvision
 
 ## Usage
 
+### For Photos
+
 1. Place one or more input images in the folder `./depth/input`.
 
 2. Run the model:
 
 ```bash
     python run.py
+```
+
+### For Videos
+
+1. Place one or more input videos in the folder `./depth/input`.
+
+2. Run the model and depth disparity maps are stored as photos in folders with the same name as the input video, sampled at 1 fps:
+
+```bash
+    python run.py -v
 ```
 
 ## References
