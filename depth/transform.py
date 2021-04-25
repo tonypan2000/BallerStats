@@ -17,7 +17,7 @@ class DepthTracker:
         if self.coordinate is None:
             self.coordinate = new_coord
             return 0
-        dist = np.linalg.norm(new_coord - self.coordinate)
+        dist = np.linalg.norm(np.array([new_coord[0] - self.coordinate[0], new_coord[2] - self.coordinate[2]]))
         self.coordinate = new_coord
         return dist
 
