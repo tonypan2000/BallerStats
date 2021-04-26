@@ -34,9 +34,6 @@ if __name__ == "__main__":
     distances = []
     currentFrame = 0
     while cap.isOpened():
-        # Run object tracker every few frames
-        currentFrame += fps / objectTrackerFPS
-        cap.set(cv2.CAP_PROP_POS_FRAMES, currentFrame)
         ret, frame = cap.read()
         if not ret:
             print("Can't receive frame (stream end?). Exiting ...")
@@ -58,6 +55,9 @@ if __name__ == "__main__":
             cv2.putText(img, f"{dist_traveled:.1f}m", (x1, y1 - 5), cv2.FONT_HERSHEY_DUPLEX, 0.5, (255, 255, 255))
         cv2.imshow('BallerStats', img)
         cv2.waitKey(1)
+        # Run object tracker every few frames (skip ahead a few)
+        currentFrame += fps / objectTrackerFPS
+        cap.set(cv2.CAP_PROP_POS_FRAMES, currentFrame)
 
     cap.release()
     cv2.destroyAllWindows()
