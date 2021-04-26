@@ -11,7 +11,7 @@ class ObjectTracker:
         self.name = name
         self.color = color
         self.locations = np.array(
-            [[[bounding_box[0] + round(bounding_box[2] / 2), bounding_box[1] + round(bounding_box[3] / 2)]]])
+            [[[bounding_box[0] + bounding_box[2] // 2, bounding_box[1] + bounding_box[3] // 2]]])
 
     def track(self, frame):
         (success, box) = self.tracker.update(frame)
