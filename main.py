@@ -26,8 +26,9 @@ if __name__ == "__main__":
     if not ret:
         print("Can't receive frame (stream end?). Exiting ...")
         exit()
-    print("Select bounding box for person, then hit enter")
-    tracker_person = ObjectTracker(img, "Richard Guan, 20", color=(0, 255, 0))
+    player_name = input("Enter name and age of player: ")  # "Richard Guan, 20"
+    print("Select bounding box for player, then hit enter")
+    tracker_person = ObjectTracker(img, player_name, color=(0, 255, 0))
     print("Select bounding box for landmark, then hit enter")
     tracker_landmark = ObjectTracker(img, "Landmark", color=(0, 0, 255))
 
