@@ -1,6 +1,12 @@
 # BallerStats
 
-Estimates distance traveled by a basketball player based on video footage
+This is the presentation for the final project of the course Intro to Computer Vision. Our program estimates the distance traveled by a basketball player based on video footage. We combined camera calibration, object tracking, depth estimation with deep learning, and image transformations in this project.
+
+## Presentation
+
+[![Our Presentation Video](https://img.youtube.com/vi/GaL21ADNyes/maxresdefault.jpg)](https://www.youtube.com/embed/GaL21ADNyes)
+
+See more [demo videos](https://github.com/tonypan2000/BallerStats/releases/download/1.2/demo.zip) under Release
 
 ## Requirements
 
